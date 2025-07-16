@@ -18,6 +18,7 @@ import requests
 # utility function
 import os
 from openai import AzureOpenAI
+from functools import cache
 
 import json
 import sys
@@ -28,16 +29,25 @@ import numpy as np
 from matplotlib import pyplot as plt
 import easyocr
 from paddleocr import PaddleOCR
-reader = easyocr.Reader(['en'])
-paddle_ocr = PaddleOCR(
-    lang='ch',  # other lang also available
-    use_angle_cls=False,
-    use_gpu=False,  # using cuda will conflict with pytorch in the same process
-    show_log=False,
-    max_batch_size=1024,
-    use_dilation=True,  # improves accuracy
-    det_db_score_mode='slow',  # improves accuracy
-    rec_batch_num=1024)
+
+
+@cache
+def reader():
+    return easyocr.Reader(['en'])
+
+
+@cache
+def paddle_ocr():
+    return PaddleOCR(
+        lang='ch',  # other lang also available
+        use_angle_cls=False,
+        use_gpu=True,  # using cuda will conflict with pytorch in the same process
+        show_log=False,
+        max_batch_size=1024,
+        use_dilation=True,  # improves accuracy
+        det_db_score_mode='slow',  # improves accuracy
+        rec_batch_num=1024
+    )
 
 
 def get_caption_model_processor(model_name, model_name_or_path="Salesforce/blip2-opt-2.7b", device=None):
@@ -585,13 +595,13 @@ def check_ocr_box(image_source: Union[str, Image.Image], display_img=True, outpu
             text_threshold = 0.5
         else:
             text_threshold = easyocr_args['text_threshold']
-        result = paddle_ocr.ocr(image_np, cls=False)[0]
+        result = paddle_ocr().ocr(image_np, cls=False)[0]
         coord = [item[0] for item in result if item[1][1] > text_threshold]
         text = [item[1][0] for item in result if item[1][1] > text_threshold]
     else:  # EasyOCR
         if easyocr_args is None:
             easyocr_args = {}
-        result = reader.readtext(image_np, **easyocr_args)
+        result = reader().readtext(image_np, **easyocr_args)
         coord = [item[0] for item in result]
         text = [item[1] for item in result]
     if display_img:
