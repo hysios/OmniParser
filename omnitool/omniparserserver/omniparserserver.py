@@ -38,7 +38,7 @@ class ParseRequest(BaseModel):
 async def parse(parse_request: ParseRequest):
     print('start parsing...')
     start = time.time()
-    dino_labled_img, parsed_content_list = omniparser.parse(parse_request.base64_image)
+    dino_labled_img, parsed_content_list = omniparser.parse(parse_request.base64_image, use_paddleocr=True)
     latency = time.time() - start
     print('time:', latency)
     return {"som_image_base64": dino_labled_img, "parsed_content_list": parsed_content_list, 'latency': latency}
