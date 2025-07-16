@@ -500,7 +500,7 @@ def get_som_labeled_img(image_source: Union[str, Image.Image], model=None, BOX_T
                  for box in xyxy.tolist() if int_box_area(box, w, h) > 0]
     filtered_boxes = remove_overlap_new(
         boxes=xyxy_elem, iou_threshold=iou_threshold, ocr_bbox=ocr_bbox_elem)
-
+    print('filtered_boxes:', filtered_boxes)
     # sort the filtered_boxes so that the one with 'content': None is at the end, and get the index of the first 'content': None
     filtered_boxes_elem = sorted(
         filtered_boxes, key=lambda x: x['content'] is None)
