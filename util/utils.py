@@ -42,8 +42,6 @@ def paddle_ocr():
         lang='ch',  # other lang also available
         use_textline_orientation=False,
         show_log=False,
-        use_dilation=True,  # improves accuracy
-        det_db_score_mode='slow',  # improves accuracy
         rec_batch_num=1024
     )
 
