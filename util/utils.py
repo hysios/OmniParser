@@ -28,20 +28,22 @@ import numpy as np
 # %matplotlib inline
 from matplotlib import pyplot as plt
 import easyocr
-from paddleocr import PaddleOCR
 
 
 @cache
 def reader():
-    return easyocr.Reader(['en'])
+    return easyocr.Reader(['ch_sim', 'en'], gpu=True)
 
 
 @cache
 def paddle_ocr():
+    from paddleocr import PaddleOCR
     return PaddleOCR(
         lang='ch',  # other lang also available
-        use_textline_orientation=False,
+        use_gpu=False,
+        use_angle_cls=False,
         show_log=False,
+        max_batch_size=1024,
         rec_batch_num=1024
     )
 
@@ -591,7 +593,8 @@ def check_ocr_box(image_source: Union[str, Image.Image], display_img=True, outpu
             text_threshold = 0.5
         else:
             text_threshold = easyocr_args['text_threshold']
-        result = paddle_ocr().ocr(image_np, cls=False)[0]
+        result = paddle_ocr().ocr(image_np)[0]
+        print('result', result)
         coord = [item[0] for item in result if item[1][1] > text_threshold]
         text = [item[1][0] for item in result if item[1][1] > text_threshold]
     else:  # EasyOCR
