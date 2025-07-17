@@ -40,10 +40,8 @@ def reader():
 def paddle_ocr():
     return PaddleOCR(
         lang='ch',  # other lang also available
-        use_angle_cls=False,
-        use_gpu=True,  # using cuda will conflict with pytorch in the same process
+        use_textline_orientation=False,
         show_log=False,
-        max_batch_size=1024,
         use_dilation=True,  # improves accuracy
         det_db_score_mode='slow',  # improves accuracy
         rec_batch_num=1024
